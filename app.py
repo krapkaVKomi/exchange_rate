@@ -14,9 +14,35 @@ migrate = Migrate(app, db)
 api = Api()
 
 
-class ExchangeRate(db.Model):
+class UAN(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    currency = db.Column(db.String(50), nullable=False)
+    date = db.Column(db.DateTime, default=datetime.date)
+    rate_to_usd = db.Column(db.Float, nullable=False)
+
+    def __repr__(self):
+        return '<ExchangeRate %r>' % self.id
+
+
+class PLN(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    date = db.Column(db.DateTime, default=datetime.date)
+    rate_to_usd = db.Column(db.Float, nullable=False)
+
+    def __repr__(self):
+        return '<ExchangeRate %r>' % self.id
+
+
+class EUR(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    date = db.Column(db.DateTime, default=datetime.date)
+    rate_to_usd = db.Column(db.Float, nullable=False)
+
+    def __repr__(self):
+        return '<ExchangeRate %r>' % self.id
+
+
+class CAD(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.DateTime, default=datetime.date)
     rate_to_usd = db.Column(db.Float, nullable=False)
 
