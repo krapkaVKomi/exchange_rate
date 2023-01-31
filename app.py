@@ -1,9 +1,11 @@
-from datetime import datetime
 from flask import Flask
 from flask_restful import Api, Resource
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_marshmallow import Marshmallow
+import datetime
+import requests
+import json
 
 
 app = Flask(__name__)
@@ -17,10 +19,10 @@ ma = Marshmallow(app)
 api = Api()
 
 
-class UAN(db.Model):
+class UAN(db.Model): # UAH (гривня)
     id = db.Column(db.Integer, primary_key=True)
-    date = db.Column(db.DateTime, default=datetime.date)
-    rate_to_usd = db.Column(db.Float, nullable=False)
+    date = db.Column(db.DateTime, default=datetime.datetime.now().strftime("%Y-%m-%d"))
+    rate_to_usd = db.Column(db.String(50), nullable=False)
 
     def __repr__(self):
         return '<UAN %r>' % self.rate_to_usd
@@ -33,8 +35,8 @@ class UANSchema(ma.Schema):  # десеріалізація
 
 class PLN(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    date = db.Column(db.DateTime, default=datetime.date)
-    rate_to_usd = db.Column(db.Float, nullable=False)
+    date = db.Column(db.DateTime, default=datetime.datetime.now().strftime("%Y-%m-%d"))
+    rate_to_usd = db.Column(db.String(50), nullable=False)
 
     def __repr__(self):
         return '<PLN %r>' % self.rate_to_usd
@@ -47,8 +49,8 @@ class PLNSchema(ma.Schema):
 
 class EUR(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    date = db.Column(db.DateTime, default=datetime.date)
-    rate_to_usd = db.Column(db.Float, nullable=False)
+    date = db.Column(db.DateTime, default=datetime.datetime.now().strftime("%Y-%m-%d"))
+    rate_to_usd = db.Column(db.String(50), nullable=False)
 
     def __repr__(self):
         return '<EUR %r>' % self.rate_to_usd
@@ -61,8 +63,8 @@ class EURSchema(ma.Schema):
 
 class CAD(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    date = db.Column(db.DateTime, default=datetime.date)
-    rate_to_usd = db.Column(db.Float, nullable=False)
+    date = db.Column(db.DateTime, default=datetime.datetime.now().strftime("%Y-%m-%d"))
+    rate_to_usd = db.Column(db.String(50), nullable=False)
 
     def __repr__(self):
         return '<CAD %r>' % self.rate_to_usd
@@ -73,18 +75,96 @@ class CADSchema(ma.Schema):
         fields = ('date', 'rate_to_usd')
 
 
+def funk(exchange):
+    url = f"https://api.apilayer.com/exchangerates_data/convert?to={exchange}&from=USD&amount=1"
+
+    payload = {}
+    headers = {"apikey": "kx4ivlz0zmOuRSz53WqiIoHyAF1cNbeF"}
+    response = requests.request("GET", url, headers=headers, data=payload)
+
+    result = response.text
+    result = json.loads(result)['info']
+    return result['rate']
+
+
 UAN_schema = UANSchema()
-uan = UAN(id=0, date='2023-01-01', rate_to_usd=0.2456)
+PLN_schema = PLNSchema()
+EUR_schema = EURSchema()
+CAD_schema = CADSchema()
 
 
 class Main(Resource):
 
     def get(self, exchange, date):
         print(exchange, date)
-        if exchange:
-            with app.test_request_context():
-                res = UAN_schema.dump(uan)
-            return res
+        if exchange and date:
+            if exchange == 'UAH':
+                rates = UAN.query.filter_by(date=date).all()
+                if len(rates) == 0:
+                    rate = funk(exchange=exchange)
+                    item = UAN(rate_to_usd=rate)
+                    try:
+                        db.session.add(item)
+                        db.session.commit()
+                    except:
+                        return "ERROR WRITING TO DB"
+                    rate = item
+                else:
+                    rate = rates[-1]
+                with app.test_request_context():
+                    res = UAN_schema.dump(rate)
+                return res
+
+            if exchange == 'PLN':
+                rates = PLN.query.filter_by(date=date).all()
+                if len(rates) == 0:
+                    rate = funk(exchange=exchange)
+                    item = PLN(rate_to_usd=rate)
+                    try:
+                        db.session.add(item)
+                        db.session.commit()
+                    except:
+                        return "ERROR WRITING TO DB"
+                    rate = item
+                else:
+                    rate = rates[-1]
+                with app.test_request_context():
+                    res = PLN_schema.dump(rate)
+                return res
+
+            if exchange == 'CAD':
+                rates = CAD.query.filter_by(date=date).all()
+                if len(rates) == 0:
+                    rate = funk(exchange=exchange)
+                    item = CAD(rate_to_usd=rate)
+                    try:
+                        db.session.add(item)
+                        db.session.commit()
+                    except:
+                        return "ERROR WRITING TO DB"
+                    rate = item
+                else:
+                    rate = rates[-1]
+                with app.test_request_context():
+                    res = CAD_schema.dump(rate)
+                return res
+
+            if exchange == 'EUR':
+                rates = EUR.query.filter_by(date=date).all()
+                if len(rates) == 0:
+                    rate = funk(exchange=exchange)
+                    item = EUR(rate_to_usd=rate)
+                    try:
+                        db.session.add(item)
+                        db.session.commit()
+                    except:
+                        return "ERROR WRITING TO DB"
+                    rate = item
+                else:
+                    rate = rates[-1]
+                with app.test_request_context():
+                    res = EUR_schema.dump(rate)
+                return res
 
 
 api.add_resource(Main, "/api/<string:exchange>/<string:date>")
