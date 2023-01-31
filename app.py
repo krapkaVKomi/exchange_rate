@@ -97,7 +97,6 @@ CAD_schema = CADSchema()
 class Main(Resource):
 
     def get(self, exchange, date):
-        print(exchange, date)
         if exchange and date:
             if exchange == 'UAH':
                 rates = UAN.query.filter_by(date=date).all()
@@ -208,11 +207,15 @@ api.init_app(app)
 
 
 def upload_data():
-    print('scheduler upload data')
+    date = datetime.datetime.now().strftime("%Y-%m-%d")
+    currency = ['UAN', 'PLN', 'CAD', 'EUR']
+    for i in currency:
+        res = requests.get(f"http://127.0.0.1:3000/api/{i}/{date}")
+        print(res)
 
 
 if __name__ == "__main__":
-    scheduler.add_job(id='Scheduled task', func=upload_data, trigger='interval', seconds=3)
+    scheduler.add_job(id='Scheduled task', func=upload_data, trigger='interval', seconds=14400) # 14400 запит раз в 4 години
     scheduler.start()
     app.run(debug=True, port=3000, host="127.0.0.1")
 
