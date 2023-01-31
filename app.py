@@ -100,15 +100,25 @@ class Main(Resource):
         if exchange and date:
             if exchange == 'UAH':
                 rates = UAN.query.filter_by(date=date).all()
+                rate = funk(exchange=exchange)
+                item = UAN(rate_to_usd=rate)
                 if len(rates) == 0:
-                    rate = funk(exchange=exchange)
-                    item = UAN(rate_to_usd=rate)
                     try:
                         db.session.add(item)
                         db.session.commit()
                     except:
                         return "ERROR WRITING TO DB"
                     rate = item
+
+                elif rates[-1] != item:
+                    print(rates[-1], item)
+                    try:
+                        db.session.add(item)
+                        db.session.commit()
+                    except:
+                        return "ERROR WRITING TO DB"
+                    rate = item
+
                 else:
                     rate = rates[-1]
                 with app.test_request_context():
@@ -117,15 +127,24 @@ class Main(Resource):
 
             if exchange == 'PLN':
                 rates = PLN.query.filter_by(date=date).all()
+                rate = funk(exchange=exchange)
+                item = PLN(rate_to_usd=rate)
                 if len(rates) == 0:
-                    rate = funk(exchange=exchange)
-                    item = PLN(rate_to_usd=rate)
                     try:
                         db.session.add(item)
                         db.session.commit()
                     except:
                         return "ERROR WRITING TO DB"
                     rate = item
+                elif rates[-1] != item:
+                    print(rates[-1], item)
+                    try:
+                        db.session.add(item)
+                        db.session.commit()
+                    except:
+                        return "ERROR WRITING TO DB"
+                    rate = item
+
                 else:
                     rate = rates[-1]
                 with app.test_request_context():
@@ -134,15 +153,25 @@ class Main(Resource):
 
             if exchange == 'CAD':
                 rates = CAD.query.filter_by(date=date).all()
+                rate = funk(exchange=exchange)
+                item = CAD(rate_to_usd=rate)
                 if len(rates) == 0:
-                    rate = funk(exchange=exchange)
-                    item = CAD(rate_to_usd=rate)
                     try:
                         db.session.add(item)
                         db.session.commit()
                     except:
                         return "ERROR WRITING TO DB"
                     rate = item
+
+                elif rates[-1] != item:
+                    print(rates[-1], item)
+                    try:
+                        db.session.add(item)
+                        db.session.commit()
+                    except:
+                        return "ERROR WRITING TO DB"
+                    rate = item
+
                 else:
                     rate = rates[-1]
                 with app.test_request_context():
@@ -151,15 +180,25 @@ class Main(Resource):
 
             if exchange == 'EUR':
                 rates = EUR.query.filter_by(date=date).all()
+                rate = funk(exchange=exchange)
+                item = EUR(rate_to_usd=rate)
                 if len(rates) == 0:
-                    rate = funk(exchange=exchange)
-                    item = EUR(rate_to_usd=rate)
                     try:
                         db.session.add(item)
                         db.session.commit()
                     except:
                         return "ERROR WRITING TO DB"
                     rate = item
+
+                elif rates[-1] != item:
+                    print(rates[-1], item)
+                    try:
+                        db.session.add(item)
+                        db.session.commit()
+                    except:
+                        return "ERROR WRITING TO DB"
+                    rate = item
+
                 else:
                     rate = rates[-1]
                 with app.test_request_context():
@@ -169,6 +208,7 @@ class Main(Resource):
 
 api.add_resource(Main, "/api/<string:exchange>/<string:date>")
 api.init_app(app)
+
 
 if __name__ == "__main__":
     app.run(debug=True, port=3000, host="127.0.0.1")
