@@ -3,6 +3,7 @@ from flask_restful import Api, Resource
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_marshmallow import Marshmallow
+from flask_apscheduler import APScheduler
 import datetime
 import requests
 import json
@@ -15,8 +16,8 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 ma = Marshmallow(app)
-
 api = Api()
+scheduler = APScheduler()
 
 
 class UAN(db.Model):  # UAH (гривня)
@@ -206,6 +207,12 @@ api.add_resource(Main, "/api/<string:exchange>/<string:date>")
 api.init_app(app)
 
 
+def upload_data():
+    print('scheduler upload data')
+
+
 if __name__ == "__main__":
+    scheduler.add_job(id='Scheduled task', func=upload_data, trigger='interval', seconds=3)
+    scheduler.start()
     app.run(debug=True, port=3000, host="127.0.0.1")
 
