@@ -22,7 +22,7 @@ scheduler = APScheduler()
 
 class UAN(db.Model):  # UAH (гривня)
     id = db.Column(db.Integer, primary_key=True)
-    date = db.Column(db.DateTime, default=datetime.datetime.now().strftime("%Y-%m-%d"))
+    date = db.Column(db.String(50), default=datetime.datetime.now().strftime("%Y-%d-%m"))
     rate_to_usd = db.Column(db.Float, nullable=False)
 
     def __repr__(self):
@@ -36,7 +36,7 @@ class UANSchema(ma.Schema):  # десеріалізація
 
 class PLN(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    date = db.Column(db.DateTime, default=datetime.datetime.now().strftime("%Y-%m-%d"))
+    date = db.Column(db.String(50), default=datetime.datetime.now().strftime("%Y-%d-%m"))
     rate_to_usd = db.Column(db.Float, nullable=False)
 
     def __repr__(self):
@@ -50,7 +50,7 @@ class PLNSchema(ma.Schema):
 
 class EUR(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    date = db.Column(db.DateTime, default=datetime.datetime.now().strftime("%Y-%m-%d"))
+    date = db.Column(db.String(50), default=datetime.datetime.now().strftime("%Y-%d-%m"))
     rate_to_usd = db.Column(db.Float, nullable=False)
 
     def __repr__(self):
@@ -64,7 +64,7 @@ class EURSchema(ma.Schema):
 
 class CAD(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    date = db.Column(db.DateTime, default=datetime.datetime.now().strftime("%Y-%m-%d"))
+    date = db.Column(db.String(50), default=datetime.datetime.now().strftime("%Y-%d-%m"))
     rate_to_usd = db.Column(db.Float, nullable=False)
 
     def __repr__(self):
@@ -100,6 +100,8 @@ class Main(Resource):
         if exchange and date:
             if exchange == 'UAH':
                 rates = UAN.query.filter_by(date=date).all()
+                print(date)
+                print(rates)
                 rate = funk(exchange=exchange)
                 item = UAN(rate_to_usd=rate)
                 if len(rates) == 0:
@@ -110,7 +112,7 @@ class Main(Resource):
                         return "ERROR WRITING TO DB"
                     rate = item
 
-                elif rates[-1] != item:
+                elif rates[-1].rate_to_usd != item.rate_to_usd:
                     try:
                         db.session.add(item)
                         db.session.commit()
@@ -135,7 +137,7 @@ class Main(Resource):
                     except:
                         return "ERROR WRITING TO DB"
                     rate = item
-                elif rates[-1] != item:
+                elif rates[-1].rate_to_usd != item.rate_to_usd:
                     try:
                         db.session.add(item)
                         db.session.commit()
@@ -161,7 +163,7 @@ class Main(Resource):
                         return "ERROR WRITING TO DB"
                     rate = item
 
-                elif rates[-1] != item:
+                elif rates[-1].rate_to_usd != item.rate_to_usd:
                     try:
                         db.session.add(item)
                         db.session.commit()
@@ -187,7 +189,7 @@ class Main(Resource):
                         return "ERROR WRITING TO DB"
                     rate = item
 
-                elif rates[-1] != item:
+                elif rates[-1].rate_to_usd != item.rate_to_usd:
                     try:
                         db.session.add(item)
                         db.session.commit()
@@ -215,7 +217,7 @@ def upload_data():
 
 
 if __name__ == "__main__":
-    scheduler.add_job(id='Scheduled task', func=upload_data, trigger='interval', seconds=14400) # 14400 запит раз в 4 години
+    scheduler.add_job(id='Scheduled task', func=upload_data, trigger='interval', seconds=14400)    # 14400 запит раз в 4 години
     scheduler.start()
     app.run(debug=True, port=3000, host="127.0.0.1")
 
