@@ -9,7 +9,7 @@ import json
 
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres@localhost:5432/exchange_rate'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres@localhost:5432/rate'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -19,10 +19,10 @@ ma = Marshmallow(app)
 api = Api()
 
 
-class UAN(db.Model): # UAH (гривня)
+class UAN(db.Model):  # UAH (гривня)
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.DateTime, default=datetime.datetime.now().strftime("%Y-%m-%d"))
-    rate_to_usd = db.Column(db.String(50), nullable=False)
+    rate_to_usd = db.Column(db.Float, nullable=False)
 
     def __repr__(self):
         return '<UAN %r>' % self.rate_to_usd
@@ -36,7 +36,7 @@ class UANSchema(ma.Schema):  # десеріалізація
 class PLN(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.DateTime, default=datetime.datetime.now().strftime("%Y-%m-%d"))
-    rate_to_usd = db.Column(db.String(50), nullable=False)
+    rate_to_usd = db.Column(db.Float, nullable=False)
 
     def __repr__(self):
         return '<PLN %r>' % self.rate_to_usd
@@ -50,7 +50,7 @@ class PLNSchema(ma.Schema):
 class EUR(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.DateTime, default=datetime.datetime.now().strftime("%Y-%m-%d"))
-    rate_to_usd = db.Column(db.String(50), nullable=False)
+    rate_to_usd = db.Column(db.Float, nullable=False)
 
     def __repr__(self):
         return '<EUR %r>' % self.rate_to_usd
@@ -64,7 +64,7 @@ class EURSchema(ma.Schema):
 class CAD(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.DateTime, default=datetime.datetime.now().strftime("%Y-%m-%d"))
-    rate_to_usd = db.Column(db.String(50), nullable=False)
+    rate_to_usd = db.Column(db.Float, nullable=False)
 
     def __repr__(self):
         return '<CAD %r>' % self.rate_to_usd
@@ -111,7 +111,6 @@ class Main(Resource):
                     rate = item
 
                 elif rates[-1] != item:
-                    print(rates[-1], item)
                     try:
                         db.session.add(item)
                         db.session.commit()
@@ -137,7 +136,6 @@ class Main(Resource):
                         return "ERROR WRITING TO DB"
                     rate = item
                 elif rates[-1] != item:
-                    print(rates[-1], item)
                     try:
                         db.session.add(item)
                         db.session.commit()
@@ -164,7 +162,6 @@ class Main(Resource):
                     rate = item
 
                 elif rates[-1] != item:
-                    print(rates[-1], item)
                     try:
                         db.session.add(item)
                         db.session.commit()
@@ -191,7 +188,6 @@ class Main(Resource):
                     rate = item
 
                 elif rates[-1] != item:
-                    print(rates[-1], item)
                     try:
                         db.session.add(item)
                         db.session.commit()
