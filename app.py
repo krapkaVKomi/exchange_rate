@@ -3,6 +3,7 @@ from flask import Flask
 from flask_restful import Api, Resource
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+from flask_marshmallow import Marshmallow
 
 
 app = Flask(__name__)
@@ -11,6 +12,8 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
+ma = Marshmallow(app)
+
 api = Api()
 
 
@@ -20,7 +23,12 @@ class UAN(db.Model):
     rate_to_usd = db.Column(db.Float, nullable=False)
 
     def __repr__(self):
-        return '<ExchangeRate %r>' % self.id
+        return '<UAN %r>' % self.rate_to_usd
+
+
+class UANSchema(ma.Schema):  # десеріалізація
+    class Meta:
+        fields = ('date', 'rate_to_usd')
 
 
 class PLN(db.Model):
@@ -29,7 +37,12 @@ class PLN(db.Model):
     rate_to_usd = db.Column(db.Float, nullable=False)
 
     def __repr__(self):
-        return '<ExchangeRate %r>' % self.id
+        return '<PLN %r>' % self.rate_to_usd
+
+
+class PLNSchema(ma.Schema):
+    class Meta:
+        fields = ('date', 'rate_to_usd')
 
 
 class EUR(db.Model):
@@ -38,7 +51,12 @@ class EUR(db.Model):
     rate_to_usd = db.Column(db.Float, nullable=False)
 
     def __repr__(self):
-        return '<ExchangeRate %r>' % self.id
+        return '<EUR %r>' % self.rate_to_usd
+
+
+class EURSchema(ma.Schema):
+    class Meta:
+        fields = ('date', 'rate_to_usd')
 
 
 class CAD(db.Model):
@@ -47,12 +65,24 @@ class CAD(db.Model):
     rate_to_usd = db.Column(db.Float, nullable=False)
 
     def __repr__(self):
-        return '<ExchangeRate %r>' % self.id
+        return '<CAD %r>' % self.rate_to_usd
+
+
+class CADSchema(ma.Schema):
+    class Meta:
+        fields = ('date', 'rate_to_usd')
+
+
+UAN_schema = UANSchema()
+uan = UAN(id=0, date='2023-01-01', rate_to_usd=0.2456)
 
 
 class Main(Resource):
+
     def get(self):
-        return {"info": "Some info", "nun": 56}
+        with app.test_request_context():
+            res = UAN_schema.dump(uan)
+        return res
 
 
 api.add_resource(Main, "/api/main")
