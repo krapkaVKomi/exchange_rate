@@ -79,13 +79,15 @@ uan = UAN(id=0, date='2023-01-01', rate_to_usd=0.2456)
 
 class Main(Resource):
 
-    def get(self):
-        with app.test_request_context():
-            res = UAN_schema.dump(uan)
-        return res
+    def get(self, exchange, date):
+        print(exchange, date)
+        if exchange:
+            with app.test_request_context():
+                res = UAN_schema.dump(uan)
+            return res
 
 
-api.add_resource(Main, "/api/main")
+api.add_resource(Main, "/api/<string:exchange>/<string:date>")
 api.init_app(app)
 
 if __name__ == "__main__":
