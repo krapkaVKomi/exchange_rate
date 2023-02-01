@@ -19,6 +19,7 @@ with parameters password: postgres  port: 5432  name: rate
 
 Create and execute migrations
 > flask db migrate
+
 > flask db upgrade
 
 Run project
