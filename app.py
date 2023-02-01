@@ -98,8 +98,10 @@ class Main(Resource):
 
     def get(self, exchange, date):
         if exchange and date:
+            print(exchange, date)
             if exchange == 'UAH':
                 rates = UAN.query.filter_by(date=date).all()
+                print(rates)
                 rate = funk(exchange=exchange)
                 item = UAN(rate_to_usd=rate)
                 if len(rates) == 0:
@@ -111,12 +113,16 @@ class Main(Resource):
                     rate = item
 
                 elif rates[-1].rate_to_usd != item.rate_to_usd:
-                    try:
-                        db.session.add(item)
-                        db.session.commit()
-                    except:
-                        return "ERROR WRITING TO DB"
+                    if date == datetime.datetime.now().strftime("%Y-%d-%m"):
+                        print('date')
+                        try:
+                            db.session.add(item)
+                            db.session.commit()
+                        except:
+                            return "ERROR WRITING TO DB"
                     rate = item
+                    rate.date = date
+
 
                 else:
                     rate = rates[-1]
@@ -136,12 +142,14 @@ class Main(Resource):
                         return "ERROR WRITING TO DB"
                     rate = item
                 elif rates[-1].rate_to_usd != item.rate_to_usd:
-                    try:
-                        db.session.add(item)
-                        db.session.commit()
-                    except:
-                        return "ERROR WRITING TO DB"
+                    if date == datetime.datetime.now().strftime("%Y-%d-%m"):
+                        try:
+                            db.session.add(item)
+                            db.session.commit()
+                        except:
+                            return "ERROR WRITING TO DB"
                     rate = item
+                    rate.date = date
 
                 else:
                     rate = rates[-1]
@@ -162,12 +170,14 @@ class Main(Resource):
                     rate = item
 
                 elif rates[-1].rate_to_usd != item.rate_to_usd:
-                    try:
-                        db.session.add(item)
-                        db.session.commit()
-                    except:
-                        return "ERROR WRITING TO DB"
+                    if date == datetime.datetime.now().strftime("%Y-%d-%m"):
+                        try:
+                            db.session.add(item)
+                            db.session.commit()
+                        except:
+                            return "ERROR WRITING TO DB"
                     rate = item
+                    rate.date = date
 
                 else:
                     rate = rates[-1]
@@ -188,12 +198,14 @@ class Main(Resource):
                     rate = item
 
                 elif rates[-1].rate_to_usd != item.rate_to_usd:
-                    try:
-                        db.session.add(item)
-                        db.session.commit()
-                    except:
-                        return "ERROR WRITING TO DB"
+                    if date == datetime.datetime.now().strftime("%Y-%d-%m"):
+                        try:
+                            db.session.add(item)
+                            db.session.commit()
+                        except:
+                            return "ERROR WRITING TO DB"
                     rate = item
+                    rate.date = date
 
                 else:
                     rate = rates[-1]
