@@ -13,3 +13,17 @@ Activate virtual environment
 Install packages 
 > pip install -r requirements.txt
 
+Need create new database in Postgresql 
+with parameters password: postgres  port: 5432  name: rate  
+
+
+Create and execute migrations
+> flask db migrate
+> flask db upgrade
+
+Run project
+> python app.py
+
+
+
+
