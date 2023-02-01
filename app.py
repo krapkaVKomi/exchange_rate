@@ -100,8 +100,6 @@ class Main(Resource):
         if exchange and date:
             if exchange == 'UAH':
                 rates = UAN.query.filter_by(date=date).all()
-                print(date)
-                print(rates)
                 rate = funk(exchange=exchange)
                 item = UAN(rate_to_usd=rate)
                 if len(rates) == 0:
