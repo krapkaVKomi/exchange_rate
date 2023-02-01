@@ -4,7 +4,9 @@ Download project
 
 In the folder with the project, you need to create a virtual environment
 > mkdir myproject
+
 > cd myproject
+ 
 > py -3 -m venv venv
 
 Activate virtual environment
